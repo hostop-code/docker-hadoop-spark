@@ -48,7 +48,7 @@ services:
       - ./hadoop.env
     environment:
       HIVE_CORE_CONF_javax_jdo_option_ConnectionURL: "jdbc:postgresql://hive-metastore/metastore"
-      SERVICE_PRECONDITION: "hive-metastore:9083"
+      SERVICE_PRECONDITION: "master:9083"
 
   hive-metastore:
     image: bde2020/hive:2.3.2-postgresql-metastore
@@ -84,7 +84,7 @@ services:
     restart: always
     network_mode: "host"
     environment:
-      SERVICE_PRECONDITION: "master:9000 master:9870 worker1:9864 worker2:9864 master:8088"
+      SERVICE_PRECONDITION: "master:9000 master:9870 master:8088 worker1:9864 worker2:9864"
     env_file:
       - ./hadoop.env
 
