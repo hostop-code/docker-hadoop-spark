@@ -2,12 +2,14 @@ version: "3"
 
 services:
   
-  # ==================MASTER======================
+  # =================Master=================
   namenode:
     image: kevinity310/hadoop-namenode:dev
     container_name: namenode
     restart: always
-    network_mode: "host"
+    ports:
+      - 9870:9870
+      - 9010:9000
     volumes:
       - hadoop_namenode:/hadoop/dfs/name
     environment:
@@ -19,18 +21,20 @@ services:
   resourcemanager:
     image: kevinity310/hadoop-resourcemanager:dev
     container_name: resourcemanager
+    ports:
+      - "8088:8088"
     restart: always
-    network_mode: "host"
     environment:
       SERVICE_PRECONDITION: "10.1.111.18:9000 10.1.111.18:9870 10.1.111.19:9864 10.1.111.20:9864"
     env_file:
       - ./hadoop.env
-
+    
   historyserver:
     image: kevinity310/hadoop-historyserver:dev
     container_name: historyserver
     restart: always
-    network_mode: "host"
+    ports:
+      - "8188:8188"
     environment:
       SERVICE_PRECONDITION: "10.1.111.18:9000 10.1.111.18:9870 10.1.111.19:9864 10.1.111.20:9864 10.1.111.18:8088"
     volumes:
@@ -43,12 +47,14 @@ services:
     container_name: hive-server
     depends_on:
       - namenode
-      # - datanode
+      - datanode
     env_file:
       - ./hadoop.env
     environment:
-      HIVE_CORE_CONF_javax_jdo_option_ConnectionURL: "jdbc:postgresql://docker1/metastore"
-      SERVICE_PRECONDITION: "10.1.111.18:9083"
+      HIVE_CORE_CONF_javax_jdo_option_ConnectionURL: "jdbc:postgresql://hive-metastore/metastore"
+      SERVICE_PRECONDITION: "hive-metastore:9083"
+    ports:
+      - "10000:10000"
 
   hive-metastore:
     image: bde2020/hive:2.3.2-postgresql-metastore
@@ -58,6 +64,8 @@ services:
     command: /opt/hive/bin/hive --service metastore
     environment:
       SERVICE_PRECONDITION: "10.1.111.18:9870 10.1.111.19:9864 10.1.111.20:9864 hive-metastore-postgresql:5432"
+    ports:
+      - "9083:9083"
 
   hive-metastore-postgresql:
     image: bde2020/hive-metastore-postgresql:2.3.0
@@ -66,43 +74,44 @@ services:
   presto-coordinator:
     image: shawnzhu/prestodb:0.181
     container_name: presto-coordinator
-    restart: always
-    network_mode: "host"
-
+    ports:
+      - "8089:8089"
+  
   jupyter_dev:
     image: kevinity310/jupyter-notebook:dev
     container_name: jupyter_dev
-    restart: always
-    network_mode: "host"
+    ports:
+      - "8889:8888"
     env_file:
       - ./hadoop.env
+      
+# =================Worker=================
 
-# ====================== WORKER =======================
-  nodemanager:
+  nodemanager1:
     image: kevinity310/hadoop-nodemanager:dev
-    container_name: nodemanager
+    container_name: nodemanager1
     restart: always
-    network_mode: "host"
     environment:
-      SERVICE_PRECONDITION: "10.1.111.18:9000 10.1.111.18:9870 10.1.111.18:8088 10.1.111.19:9864 10.1.111.20:9864"
+      SERVICE_PRECONDITION: "10.1.111.18:9000 10.1.111.18:9870 10.1.111.19:9864 10.1.111.20:9864 10.1.111.18:8088"
     env_file:
       - ./hadoop.env
-
+    
   datanode:
-    image: kevinity310/hadoop-datanode:dev
-    container_name: datanode
-    restart: always
-    network_mode: "host"
-    volumes:
-      - hadoop_datanode:/hadoop/dfs/data
-    environment:
-      SERVICE_PRECONDITION: "10.1.111.18:9870"
-      CORE_CONF_fs_defaultFS: hdfs://10.1.111.18:9000
-    env_file:
-      - ./hadoop.env
-  
-
+      image: kevinity310/hadoop-datanode:dev
+      container_name: datanode
+      restart: always
+      volumes:
+        - hadoop_datanode:/hadoop/dfs/data
+      environment:
+        SERVICE_PRECONDITION: "10.1.111.18:9870"
+        CORE_CONF_fs_defaultFS: hdfs://10.1.111.18:9000
+      ports:
+        - "9864:9864"
+      env_file:
+        - ./hadoop.env
+      
 volumes:
   hadoop_namenode:
   hadoop_datanode:
   hadoop_historyserver:
+
