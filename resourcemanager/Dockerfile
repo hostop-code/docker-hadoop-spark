@@ -1,4 +1,4 @@
-FROM bde2020/hadoop-base:2.0.0-hadoop3.2.1-java8
+FROM kevinity310/hadoop-base:dev
 
 MAINTAINER Ivan Ermilov <ivan.s.ermilov@gmail.com>
 

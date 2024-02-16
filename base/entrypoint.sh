@@ -31,6 +31,37 @@ function configure() {
     done
 }
 
+function addPropertyLine() {
+  local path=$1
+  local name=$2
+  local value=$3
+
+  local entry="${name} ${value}"
+  local escapedEntry=$(echo $entry | sed 's/\//\\\//g')
+  sed -i "s/^${name}.*/${escapedEntry}/" $path
+}
+
+function configureLine() {
+    local path=$1
+    local module=$2
+    local envPrefix=$3
+
+    local var
+    local value
+    
+    echo "Configuring $module"
+    for c in `printenv | perl -sne 'print "$1 " if m/^${envPrefix}_(.+?)=.*/' -- -envPrefix=$envPrefix`; do 
+        name=`echo ${c} | perl -pe 's/___/-/g; s/__/@/g; s/_/./g; s/@/_/g;'`
+        var="${envPrefix}_${c}"
+        value=${!var}
+        echo " - Setting $name=$value"
+        addPropertyLine $path $name "$value"
+    done
+}
+
+# configurationLine /etc/spark/conf core CORE_CONF
+
+
 configure /etc/hadoop/core-site.xml core CORE_CONF
 configure /etc/hadoop/hdfs-site.xml hdfs HDFS_CONF
 configure /etc/hadoop/yarn-site.xml yarn YARN_CONF
