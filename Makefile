@@ -23,6 +23,18 @@ push:
 	docker push kevinity310/jupyter-notebook:$(current_branch)
 	# docker push kevinity310/hive:$(current_branch)
 
+push-dev: 
+	docker push kevinity310/hadoop-base:dev
+	docker push kevinity310/hadoop-namenode:dev
+	docker push kevinity310/hadoop-datanode:dev
+	docker push kevinity310/hadoop-resourcemanager:dev
+	docker push kevinity310/hadoop-nodemanager:dev
+	docker push kevinity310/hadoop-historyserver:dev
+	docker push kevinity310/hadoop-submit:dev
+	docker push kevinity310/jupyter-notebook:dev
+	# docker push kevinity310/hive:dev
+
+
 wordcount:
 	docker build -t hadoop-wordcount ./submit
 	docker run --network ${DOCKER_NETWORK} --env-file ${ENV_FILE} kevinity310/hadoop-base:$(current_branch) hdfs dfs -mkdir -p /input/
