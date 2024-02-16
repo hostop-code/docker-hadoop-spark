@@ -20,6 +20,7 @@ push:
 	docker push kevinity310/hadoop-nodemanager:$(current_branch)
 	docker push kevinity310/hadoop-historyserver:$(current_branch)
 	docker push kevinity310/hadoop-submit:$(current_branch)
+	docker push kevinity310/jupyter-notebook:$(current_branch)
 	# docker push kevinity310/hive:$(current_branch)
 
 wordcount:

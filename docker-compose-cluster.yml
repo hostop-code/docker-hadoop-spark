@@ -1,0 +1,108 @@
+version: "3"
+
+services:
+  
+  # ==================MASTER======================
+  namenode:
+    image: kevinity310/hadoop-namenode:dev
+    container_name: namenode
+    restart: always
+    network_mode: "host"
+    volumes:
+      - hadoop_namenode:/hadoop/dfs/name
+    environment:
+      - CLUSTER_NAME=test
+      - CORE_CONF_fs_defaultFS=hdfs://master:9000
+    env_file:
+      - ./hadoop.env
+
+  resourcemanager:
+    image: kevinity310/hadoop-resourcemanager:dev
+    container_name: resourcemanager
+    restart: always
+    network_mode: "host"
+    environment:
+      SERVICE_PRECONDITION: "master:9000 master:9870 worker1:9864 worker2:9864"
+    env_file:
+      - ./hadoop.env
+
+  historyserver:
+    image: kevinity310/hadoop-historyserver:dev
+    container_name: historyserver
+    restart: always
+    network_mode: "host"
+    environment:
+      SERVICE_PRECONDITION: "master:9000 master:9870 worker1:9864 worker2:9864 master:8088"
+    volumes:
+      - hadoop_historyserver:/hadoop/yarn/timeline
+    env_file:
+      - ./hadoop.env
+
+  hive-server:
+    image: bde2020/hive:2.3.2-postgresql-metastore
+    container_name: hive-server
+    depends_on:
+      - namenode
+      - datanode
+    env_file:
+      - ./hadoop.env
+    environment:
+      HIVE_CORE_CONF_javax_jdo_option_ConnectionURL: "jdbc:postgresql://hive-metastore/metastore"
+      SERVICE_PRECONDITION: "hive-metastore:9083"
+
+  hive-metastore:
+    image: bde2020/hive:2.3.2-postgresql-metastore
+    container_name: hive-metastore
+    env_file:
+      - ./hadoop.env
+    command: /opt/hive/bin/hive --service metastore
+    environment:
+      SERVICE_PRECONDITION: "master:9870 worker1:9864 worker2:9864 hive-metastore-postgresql:5432"
+
+  hive-metastore-postgresql:
+    image: bde2020/hive-metastore-postgresql:2.3.0
+    container_name: hive-metastore-postgresql
+
+  presto-coordinator:
+    image: shawnzhu/prestodb:0.181
+    container_name: presto-coordinator
+    restart: always
+    network_mode: "host"
+
+  jupyter_dev:
+    image: kevinity310/jupyter-notebook:dev
+    container_name: jupyter_dev
+    restart: always
+    network_mode: "host"
+    env_file:
+      - ./hadoop.env
+
+# ====================== WORKER =======================
+  nodemanager:
+    image: kevinity310/hadoop-nodemanager:dev
+    container_name: nodemanager
+    restart: always
+    network_mode: "host"
+    environment:
+      SERVICE_PRECONDITION: "master:9000 master:9870 worker1:9864 worker2:9864 master:8088"
+    env_file:
+      - ./hadoop.env
+
+  datanode:
+    image: kevinity310/hadoop-datanode:dev
+    container_name: datanode
+    restart: always
+    network_mode: "host"
+    volumes:
+      - hadoop_datanode:/hadoop/dfs/data
+    environment:
+      SERVICE_PRECONDITION: "master:9870"
+      CORE_CONF_fs_defaultFS: hdfs://master:9000
+    env_file:
+      - ./hadoop.env
+  
+
+volumes:
+  hadoop_namenode:
+  hadoop_datanode:
+  hadoop_historyserver:

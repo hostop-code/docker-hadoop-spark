@@ -69,9 +69,6 @@ RUN chmod a+x /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 
 
-
-
-
 ADD run.sh /run.sh
 RUN chmod a+x /run.sh
 
