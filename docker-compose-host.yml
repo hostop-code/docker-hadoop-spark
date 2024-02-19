@@ -1,0 +1,65 @@
+version: "3"
+
+services:
+  namenode:
+    image: kevinity310/hadoop-namenode:dev
+    container_name: namenode
+    restart: always
+    network_mode: "host"
+    volumes:
+      - hadoop_namenode:/hadoop/dfs/name
+    environment:
+      - CLUSTER_NAME=test
+      - CORE_CONF_fs_defaultFS=hdfs://master-hadoop:9000
+    env_file:
+      - ./hadoop-host.env
+
+  datanode:
+    image: kevinity310/hadoop-datanode:dev
+    container_name: datanode
+    restart: always
+    volumes:
+      - hadoop_datanode:/hadoop/dfs/data
+    environment:
+      SERVICE_PRECONDITION: "master-hadoop:9870"
+      CORE_CONF_fs_defaultFS: hdfs://master-hadoop:9000
+    network_mode: "host"
+    env_file:
+      - ./hadoop-host.env
+
+  resourcemanager:
+    image: kevinity310/hadoop-resourcemanager:dev
+    container_name: resourcemanager
+    network_mode: "host"
+    restart: always
+    environment:
+      SERVICE_PRECONDITION: "master-hadoop:9000 master-hadoop:9870 master-hadoop:9864"
+    env_file:
+      - ./hadoop-host.env
+
+  historyserver:
+    image: kevinity310/hadoop-historyserver:dev
+    container_name: historyserver
+    restart: always
+    network_mode: "host"
+    environment:
+      SERVICE_PRECONDITION: "master-hadoop:9000 master-hadoop:9870 master-hadoop:9864 master-hadoop:8088"
+    volumes:
+      - hadoop_historyserver:/hadoop/yarn/timeline
+    env_file:
+      - ./hadoop-host.env
+
+  # nodemanager1:
+  #   image: kevinity310/hadoop-nodemanager:dev
+  #   container_name: nodemanager1
+  #   restart: always
+  #   environment:
+  #     SERVICE_PRECONDITION: "master-hadoop:9000 master-hadoop:9870 master-hadoop:9864 master-hadoop:8088"
+  #   env_file:
+  #     - ./hadoop-host.env
+      
+volumes:
+  hadoop_namenode:
+  hadoop_datanode:
+  hadoop_historyserver:
+

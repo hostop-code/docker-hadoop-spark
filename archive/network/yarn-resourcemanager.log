@@ -1,0 +1,11 @@
+Configuring for multihomed network
+[1/100] master-hadoop:9000 is available.
+[1/100] master-hadoop:9870 is available.
+[1/100] master-hadoop:9864 is available.
+
+2024-02-17 15:29:33,553 INFO resourcemanager.ResourceManager: STARTUP_MSG: 
+/************************************************************
+STARTUP_MSG: Starting ResourceManager
+STARTUP_MSG:   host = hadoop.internal.cloudapp.net/10.1.0.4
+STARTUP_MSG:   args = []
+STARTUP_MSG:   version = 3.2.1

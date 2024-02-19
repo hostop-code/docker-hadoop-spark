@@ -1,0 +1,7 @@
+check public ip:
+- curl ifconfig.me
+- curl ident.me
+
+check private IP:
+- hostname -I | awk '{print $1}'
+- ip route get 1.2.3.4 | awk '{print $7}'
