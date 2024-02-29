@@ -66,15 +66,22 @@ function configureLine() {
     done
 }
 
-# Configure the spark-defaults.conf file
-configureLine /etc/spark/conf/spark-defaults.conf spark SPARK_CONFING
-
+# Config in format XML
+# For Hadoop
 configure /etc/hadoop/core-site.xml core CORE_CONF
 configure /etc/hadoop/hdfs-site.xml hdfs HDFS_CONF
 configure /etc/hadoop/yarn-site.xml yarn YARN_CONF
 configure /etc/hadoop/httpfs-site.xml httpfs HTTPFS_CONF
 configure /etc/hadoop/kms-site.xml kms KMS_CONF
 configure /etc/hadoop/mapred-site.xml mapred MAPRED_CONF
+
+# For Hive
+configure /etc/hive/hive-site.xml hive HIVE_SITE_CONF
+
+# Config for format .conf
+# For Spark 
+configureLine /etc/spark/conf/spark-defaults.conf spark SPARK_CONFING
+
 
 if [ "$MULTIHOMED_NETWORK" = "1" ]; then
     echo "Configuring for multihomed network"

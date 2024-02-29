@@ -27,10 +27,27 @@ RUN mkdir ${HIVE_HOME}/logs
 # Set environment variables
 ENV PATH $HIVE_HOME/bin:$PATH
 
-# ADD run.sh /run.sh
-# RUN chmod a+x /run.sh
+RUN apt install nano
 
-# EXPOSE 10000
+# Adding config for Hive
+RUN touch "$HIVE_HOME/conf/hive-site.xml" && \
+    echo '<?xml version="1.0" encoding="UTF-8"?>' > "$HIVE_HOME/conf/hive-site.xml" && \
+    echo '<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>' >> "$HIVE_HOME/conf/hive-site.xml" && \
+    echo '<configuration>' >> "$HIVE_HOME/conf/hive-site.xml" && \
+    echo '</configuration>' >> "$HIVE_HOME/conf/hive-site.xml" 
+
+WORKDIR /
+
+ADD entrypoint.sh /entrypoint.sh
+
+RUN chmod a+x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
+
+ADD run.sh /run.sh
+RUN chmod a+x /run.sh
+
+EXPOSE 10000
 
 # CMD ["/run.sh"]
 
