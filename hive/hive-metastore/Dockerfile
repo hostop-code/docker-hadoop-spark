@@ -1,6 +1,13 @@
 FROM --platform=linux/amd64 kevinity310/hadoop-nodemanager:dev
 LABEL maintainer="kevinity310"
 
+HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
+  CMD nc -z localhost 9083 || exit 1
+
+RUN apt install nano -y
+# Install Network tools 
+RUN apt install iputils-ping net-tools -y
+
 # Install Hive
 ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/
 RUN curl -O https://dist.apache.org/repos/dist/release/hive/KEYS
@@ -27,14 +34,13 @@ RUN mkdir ${HIVE_HOME}/logs
 # Set environment variables
 ENV PATH $HIVE_HOME/bin:$PATH
 
-RUN apt install nano
+# # Remove existing Guava JAR from $HIVE_HOME/lib
+RUN rm $HIVE_HOME/lib/guava-19.0.jar
 
-# Adding config for Hive
-RUN touch "$HIVE_HOME/conf/hive-site.xml" && \
-    echo '<?xml version="1.0" encoding="UTF-8"?>' > "$HIVE_HOME/conf/hive-site.xml" && \
-    echo '<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>' >> "$HIVE_HOME/conf/hive-site.xml" && \
-    echo '<configuration>' >> "$HIVE_HOME/conf/hive-site.xml" && \
-    echo '</configuration>' >> "$HIVE_HOME/conf/hive-site.xml" 
+# # Copy the appropriate Guava JAR from $HADOOP_HOME/share/hadoop/hdfs/lib to $HIVE_HOME/lib
+RUN cp $HADOOP_HOME/share/hadoop/hdfs/lib/guava-27.0-jre.jar $HIVE_HOME/lib/
+
+COPY conf/* $HIVE_HOME/conf/
 
 WORKDIR /
 
@@ -49,7 +55,7 @@ RUN chmod a+x /run.sh
 
 EXPOSE 10000
 
-# CMD ["/run.sh"]
+CMD ["/run.sh"]
 
-# docker build -t kevinity310/hive-server:dev .
-# docker run -it --rm --name test-hive-server kevinity310/hive-server:dev /bin/bash
+# docker build -t kevinity310/hive-metastore:dev .
+# docker run -it --rm --name test-hive-server --env-file hadoop-port-dev.env kevinity310/hive-metastore:dev /bin/bash 

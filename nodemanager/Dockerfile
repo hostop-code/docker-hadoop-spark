@@ -76,4 +76,4 @@ EXPOSE 8042
 
 CMD ["/run.sh"]
 
-# docker build -t kevinity310/hadoop-nodemanager:dev ./nodemanager
+# docker build -t kevinity310/hadoop-nodemanager:dev ./nodemanager --env-file 
