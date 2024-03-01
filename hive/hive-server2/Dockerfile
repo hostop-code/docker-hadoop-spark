@@ -3,11 +3,12 @@ LABEL maintainer="kevinity310"
 
 # HEALTHCHECK CMD curl -f http://localhost:9083/ || exit 1
 HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
-  CMD nc -z localhost <port> || exit 1
+  CMD nc -z localhost 10000 || exit 1
 
 RUN apt install nano -y
+
 # Install Network tools 
-RUN apt install iputils-ping net-tools -y
+RUN apt install iputils-ping net-tools lsof traceroute  -y
 
 # Install Hive
 ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/

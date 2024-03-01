@@ -27,13 +27,13 @@
 # are running at the same time. The flags below have been useful in 
 # reducing memory usage:
 #
-# if [ "$SERVICE" = "cli" ]; then
-#   if [ -z "$DEBUG" ]; then
-#     export HADOOP_OPTS="$HADOOP_OPTS -XX:NewRatio=12 -Xms10m -XX:MaxHeapFreeRatio=40 -XX:MinHeapFreeRatio=15 -XX:+UseParNewGC -XX:-UseGCOverheadLimit"
-#   else
-#     export HADOOP_OPTS="$HADOOP_OPTS -XX:NewRatio=12 -Xms10m -XX:MaxHeapFreeRatio=40 -XX:MinHeapFreeRatio=15 -XX:-UseGCOverheadLimit"
-#   fi
-# fi
+if [ "$SERVICE" = "cli" ]; then
+  if [ -z "$DEBUG" ]; then
+    export HADOOP_OPTS="$HADOOP_OPTS -XX:NewRatio=12 -Xms10m -XX:MaxHeapFreeRatio=40 -XX:MinHeapFreeRatio=15 -XX:+UseParNewGC -XX:-UseGCOverheadLimit"
+  else
+    export HADOOP_OPTS="$HADOOP_OPTS -XX:NewRatio=12 -Xms10m -XX:MaxHeapFreeRatio=40 -XX:MinHeapFreeRatio=15 -XX:-UseGCOverheadLimit"
+  fi
+fi
 
 # The heap size of the jvm stared by hive shell script can be controlled via:
 #
