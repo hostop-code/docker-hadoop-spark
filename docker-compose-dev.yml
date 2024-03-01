@@ -63,31 +63,6 @@ services:
     env_file:
       - ./hadoop-port-dev.env
 
-  hive-metastore:
-    image: kevinity310/hive-metastore:dev 
-    container_name: hive-metastore
-    hostname: hive-metastore
-    ports:
-      - "9083:9083"
-    environment:
-      SERVICE_PRECONDITION: "pg-metastore:5432 hdfs-datanode:9864"
-    env_file:
-      - ./hadoop-port-dev.env
-
-  hive-server2:
-    container_name: hive-server2
-    hostname: hive-server2
-    image: kevinity310/hive-server2:dev
-    environment:
-      SERVICE_PRECONDITION: "hdfs-namenode:9000 hdfs-namenode:9870 hdfs-datanode:9864 yarn-resourcemanager:8088 hive-metastore:9083"
-    # restart: always
-    ports:
-      - "10000:10000"
-      - "10001:10001"
-      - "10002:10002"
-    env_file:
-      - ./hadoop-port-dev.env
-
   # presto-coordinator:
   #   image: shawnzhu/prestodb:0.181
   #   container_name: presto-coordinator
