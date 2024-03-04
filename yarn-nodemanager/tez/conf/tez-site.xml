@@ -1337,5 +1337,13 @@
  Expert level setting.</description>
     <type>integer</type>
   </property>
-
+<!-- 
+  <property>
+      <name>tez.lib.uris</name>
+      <value>hdfs://localhost:8020/apps/apache-tez-0.9.1-bin/share/tez.tar.gz</value>
+  </property>
+  <property>
+      <name>tez.staging-dir</name>
+      <value>/tmp/${user.name}/staging</value>
+  </property> -->
 </configuration>
