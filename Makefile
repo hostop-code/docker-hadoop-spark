@@ -8,9 +8,9 @@ build:
 	docker build -t kevinity310/hadoop-resourcemanager:$(current_branch) ./resourcemanager
 	docker build -t kevinity310/hadoop-nodemanager:$(current_branch) ./nodemanager
 	docker build -t kevinity310/hadoop-historyserver:$(current_branch) ./historyserver
-	docker build -t kevinity310/hadoop-submit:$(current_branch) ./submit
+	# docker build -t kevinity310/hadoop-submit:$(current_branch) ./submit
 	docker build -t kevinity310/jupyter-notebook:$(current_branch) ./jupyter-notebook
-	# docker build -t kevinity310/hive:$(current_branch) ./
+	docker build -t kevinity310/hive:$(current_branch) ./hive
 
 push: 
 	docker push kevinity310/hadoop-base:$(current_branch)
@@ -19,8 +19,8 @@ push:
 	docker push kevinity310/hadoop-resourcemanager:$(current_branch)
 	docker push kevinity310/hadoop-nodemanager:$(current_branch)
 	docker push kevinity310/hadoop-historyserver:$(current_branch)
-	docker push kevinity310/hadoop-submit:$(current_branch)
-	# docker push kevinity310/hive:$(current_branch)
+	#docker push kevinity310/hadoop-submit:$(current_branch)
+	docker push kevinity310/hive:$(current_branch)
 
 wordcount:
 	docker build -t hadoop-wordcount ./submit

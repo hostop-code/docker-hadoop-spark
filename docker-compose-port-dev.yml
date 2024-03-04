@@ -63,6 +63,46 @@ services:
     env_file:
       - ./hadoop-port-dev.env
 
+  hive-metastore:
+    image: kevinity310/hive:dev 
+    command: 'hive --service metastore --verbose'
+    container_name: hive-metastore
+    ports:
+      - "9083:9083"
+    environment:
+      SERVICE_PRECONDITION: "pg-metastore:5432 hdfs-namenode:9000 hdfs-datanode:9864"
+    healthcheck:
+        test:  ["CMD-SHELL", "nc -z localhost 9083 || exit 1"]
+        interval: 30s
+        timeout: 10s
+        retries: 3
+    env_file:
+      - ./hadoop-port-dev-hive.env
+
+  hive-server2:
+    container_name: hive-server2
+    command: 'hive --service hiveserver2'
+    image: kevinity310/hive:dev
+    environment:
+      SERVICE_PRECONDITION: "hdfs-namenode:9000 hdfs-datanode:9864 hive-metastore:9083"
+    ports:
+      - "10000:10000"
+      - "10001:10001"
+      - "10002:10002"
+    extra_hosts:
+      - "hive-metastore:172.18.0.8" # please change to your hive-metastore container ip
+    depends_on:
+      - hive-metastore
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:10002"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    env_file:
+        - ./hadoop-port-dev-hive.env
+
+# 24/03/01 10:15:23 [main]: INFO thrift.ThriftCLIService: Starting ThriftBinaryCLIService on port 10000 with 5...500 worker threads (kalau ada ini berarti berhasil)
+
   # presto-coordinator:
   #   image: shawnzhu/prestodb:0.181
   #   container_name: presto-coordinator

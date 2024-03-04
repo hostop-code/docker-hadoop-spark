@@ -1,0 +1,109 @@
+version: "3"
+
+services:
+# =============== MASTER =================
+  hdfs-namenode:
+    image: kevinity310/hadoop-namenode:dev
+    container_name: hdfs-namenode
+    restart: always
+    network_mode: "host"
+    volumes:
+      - hadoop_namenode:/hadoop/dfs/name
+    environment:
+      - CLUSTER_NAME=test
+      - CORE_CONF_fs_defaultFS=hdfs://hadoop:9000
+    env_file:
+      - ./hadoop-host-dev.env
+
+  hdfs-datanode:
+    image: kevinity310/hadoop-datanode:dev
+    container_name: hdfs-datanode
+    restart: always
+    network_mode: "host"
+    volumes:
+      - hadoop_datanode:/hadoop/dfs/data
+    environment:
+      SERVICE_PRECONDITION: "hadoop:9870"
+      CORE_CONF_fs_defaultFS: hdfs://hadoop:9000
+    env_file:
+      - ./hadoop-host-dev.env
+
+  yarn-resourcemanager:
+    image: kevinity310/hadoop-resourcemanager:dev
+    container_name: yarn-resourcemanager
+    network_mode: "host"
+    restart: always
+    environment:
+      SERVICE_PRECONDITION: "hadoop:9000 hadoop:9870 hadoop:9864"
+    env_file:
+      - ./hadoop-host-dev.env
+      
+  yarn-historyserver:
+    image: kevinity310/hadoop-historyserver:dev
+    container_name: yarn-historyserver
+    restart: always
+    network_mode: "host"
+    environment:
+      SERVICE_PRECONDITION: "hadoop:9000 hadoop:9870 hadoop:9864 hadoop:8088"
+    volumes:
+      - hadoop_historyserver:/hadoop/yarn/timeline
+    env_file:
+      - ./hadoop-host-dev.env
+
+  pg-metastore:
+    image: kevinity310/pg-metastore:dev 
+    container_name: pg-metastore
+    restart: always
+    network_mode: "host"
+    env_file:
+      - ./hadoop-host-dev.env
+
+  hive-metastore:
+    image: kevinity310/hive:dev 
+    command: 'hive --service metastore --verbose'
+    container_name: hive-metastore
+    network_mode: "host"
+    environment:
+      SERVICE_PRECONDITION: "hadoop:5432 hadoop:9000 hadoop:9864"
+    healthcheck:
+      test:  ["CMD-SHELL", "nc -z localhost 9083 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    env_file:
+      - ./hadoop-host-dev.env
+
+  hive-server2:
+    container_name: hive-server2
+    command: 'hive --service hiveserver2 '
+    image: kevinity310/hive:dev
+    restart: always
+    network_mode: "host"
+    environment:
+      SERVICE_PRECONDITION: "hadoop:9000 hadoop:9864 hadoop:9083"
+    # extra_hosts:
+    #   - "hive-metastore:172.18.0.8" # please change to your hive-metastore container ip
+    depends_on:
+      - hive-metastore
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:10002"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    env_file:
+      - ./hadoop-host-dev.env
+
+  yarn-nodemanager:
+    image: kevinity310/hadoop-nodemanager:dev
+    container_name: yarn-nodemanager
+    restart: always
+    network_mode: "host"
+    environment:
+      SERVICE_PRECONDITION: "hadoop:9000 hadoop:9870 hadoop:9864 hadoop:8088"
+    env_file:
+      - ./hadoop-host-dev.env
+      
+volumes:
+  hadoop_namenode:
+  hadoop_datanode:
+  hadoop_historyserver:
