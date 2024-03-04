@@ -96,6 +96,29 @@ COPY hive/conf/* $HIVE_HOME/conf/
 
 WORKDIR /
 
+# Adding Tez
+RUN curl -O https://dist.apache.org/repos/dist/release/tez/KEYS
+
+RUN gpg --import KEYS
+
+ENV TEZ_VERSION 0.9.2
+ENV TEZ_URL https://dist.apache.org/repos/dist/release/tez/${TEZ_VERSION}/apache-tez-${TEZ_VERSION}-bin.tar.gz
+ENV TEZ_HOME /opt/tez-$TEZ_VERSION
+ENV TEZ_CONF_DIR=$TEZ_HOME/conf
+ENV HADOOP_CLASSPATH=${TEZ_HOME}/conf:${TEZ_HOME}/*:${TEZ_HOME}/lib/*
+
+RUN set -x \
+    && curl -fSL "$TEZ_URL" -o /tmp/tez.tar.gz \
+    && tar -xvf /tmp/tez.tar.gz -C /opt/ \
+    && rm /tmp/tez.tar.gz*
+
+RUN mv /opt/apache-tez-${TEZ_VERSION}-bin ${TEZ_HOME}
+
+RUN ln -s ${TEZ_HOME}/conf /etc/tez
+
+RUN mkdir ${TEZ_HOME}/logs
+
+COPY tez/conf/* ${TEZ_HOME}/conf/
 
 ADD entrypoint.sh /entrypoint.sh
 
