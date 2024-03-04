@@ -13,7 +13,11 @@ services:
       - CLUSTER_NAME=test
       - CORE_CONF_fs_defaultFS=hdfs://hadoop:9000
     env_file:
-      - ./hadoop-host-dev.env
+      - /home/ubuntu/kevin_riset/docker-hadoop-spark/hadoop-swarm.env
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
 
   hdfs-datanode:
     image: kevinity310/hadoop-datanode:dev
@@ -26,7 +30,11 @@ services:
       SERVICE_PRECONDITION: "hadoop:9870"
       CORE_CONF_fs_defaultFS: hdfs://hadoop:9000
     env_file:
-      - ./hadoop-host-dev.env
+      - /home/ubuntu/kevin_riset/docker-hadoop-spark/hadoop-swarm.env
+    deploy:
+      placement:
+        constraints:
+          - node.role == worker
 
   yarn-resourcemanager:
     image: kevinity310/hadoop-resourcemanager:dev
@@ -36,7 +44,12 @@ services:
     environment:
       SERVICE_PRECONDITION: "hadoop:9000 hadoop:9870 hadoop:9864"
     env_file:
-      - ./hadoop-host-dev.env
+      - /home/ubuntu/kevin_riset/docker-hadoop-spark/hadoop-swarm.env
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+
       
   yarn-historyserver:
     image: kevinity310/hadoop-historyserver:dev
@@ -48,7 +61,11 @@ services:
     volumes:
       - hadoop_historyserver:/hadoop/yarn/timeline
     env_file:
-      - ./hadoop-host-dev.env
+      - /home/ubuntu/kevin_riset/docker-hadoop-spark/hadoop-swarm.env
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
 
   pg-metastore:
     image: kevinity310/pg-metastore:dev 
@@ -56,7 +73,11 @@ services:
     restart: always
     network_mode: "host"
     env_file:
-      - ./hadoop-host-dev.env
+      - /home/ubuntu/kevin_riset/docker-hadoop-spark/hadoop-swarm.env
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
 
   hive-metastore:
     image: kevinity310/hive:dev 
@@ -71,7 +92,11 @@ services:
       timeout: 10s
       retries: 3
     env_file:
-      - ./hadoop-host-dev.env
+      - /home/ubuntu/kevin_riset/docker-hadoop-spark/hadoop-swarm.env
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
 
   hive-server2:
     container_name: hive-server2
@@ -91,7 +116,11 @@ services:
       timeout: 10s
       retries: 3
     env_file:
-      - ./hadoop-host-dev.env
+      - /home/ubuntu/kevin_riset/docker-hadoop-spark/hadoop-swarm.env
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
 
   yarn-nodemanager:
     image: kevinity310/hadoop-nodemanager:dev
@@ -101,7 +130,11 @@ services:
     environment:
       SERVICE_PRECONDITION: "hadoop:9000 hadoop:9870 hadoop:9864 hadoop:8088"
     env_file:
-      - ./hadoop-host-dev.env
+      - /home/ubuntu/kevin_riset/docker-hadoop-spark/hadoop-swarm.env
+    deploy:
+      placement:
+        constraints:
+          - node.role == worker
       
 volumes:
   hadoop_namenode:
