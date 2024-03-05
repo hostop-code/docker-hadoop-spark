@@ -60,6 +60,7 @@ services:
 
   hive-metastore:
     image: kevinity310/hive:dev 
+    restart: always
     command: 'hive --service metastore --verbose'
     container_name: hive-metastore
     network_mode: "host"
@@ -71,7 +72,7 @@ services:
       timeout: 10s
       retries: 3
     env_file:
-      - ./hadoop-host-hive-dev.env
+      - ./hadoop-host-dev.env
 
   hive-server2:
     container_name: hive-server2
@@ -91,7 +92,7 @@ services:
       timeout: 10s
       retries: 3
     env_file:
-      - ./hadoop-host-hive-dev.env
+      - ./hadoop-host-dev.env
 
   yarn-nodemanager:
     image: kevinity310/hadoop-nodemanager:dev

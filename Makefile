@@ -33,3 +33,12 @@ wordcount:
 	docker run --network ${DOCKER_NETWORK} --env-file ${ENV_FILE} kevinity310/hadoop-base:$(current_branch) hdfs dfs -rm -r /output
 	docker run --network ${DOCKER_NETWORK} --env-file ${ENV_FILE} kevinity310/hadoop-base:$(current_branch) hdfs dfs -rm -r /input
 
+restart:
+	docker compose -f docker-compose-host-dev.yml down -v
+	docker compose -f docker-compose-host-dev.yml up -d
+
+reset:
+	make build 
+	docker compose -f docker-compose-host-dev.yml down -v 
+	docker compose -f docker-compose-host-dev.yml up -d 
+	

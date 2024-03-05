@@ -66,9 +66,6 @@ function configureLine() {
     done
 }
 
-# Configure the spark-defaults.conf file
-configureLine /etc/spark/conf/spark-defaults.conf spark SPARK_CONFING
-
 configure /etc/hadoop/core-site.xml core CORE_CONF
 configure /etc/hadoop/hdfs-site.xml hdfs HDFS_CONF
 configure /etc/hadoop/yarn-site.xml yarn YARN_CONF
